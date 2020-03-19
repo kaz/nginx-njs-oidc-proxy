@@ -55,8 +55,11 @@ var callbackHandler = baseHandler(r => {
 			throw new Error(`invalid email: claims=${JSON.stringify(claims)}`);
 		}
 
-		// Re-sign email address with our key and store it in cookie.
-		lib.cookie.set(r, {email: claims.email});
+		// Sign user-name/email-addr with own key and store it in cookie.
+		lib.cookie.set(r, {
+			user: claims.email.split("@").shift(),
+			email: claims.email,
+		});
 		r.return(302, context.redirect);
 	});
 });
@@ -99,8 +102,9 @@ var authHandler = ruleFn => baseHandler(r => {
 	}
 
 	// These variables below can read in nginx-configuration.
+	r.variables["oidc_user"] = claims.user;
 	r.variables["oidc_email"] = claims.email;
-	r.variables["oidc_basic_auth"] = `${claims.email}:`.toUTF8().toString("base64");
+	r.variables["oidc_basic_auth"] = `${claims.user}:`.toUTF8().toString("base64");
 
 	r.internalRedirect("@upstream");
 });
