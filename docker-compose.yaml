@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  backend:
+    build: backend
+    working_dir: /srv
+    volumes:
+      - ./backend/index.php:/srv/index.php:ro
+
+  nginx:
+    build: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/js:/etc/nginx/js:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
